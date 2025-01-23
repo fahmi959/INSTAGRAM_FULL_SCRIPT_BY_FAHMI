@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OTP Verification</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h2>Verifikasi OTP</h2>
+        <form action="/otp" method="POST">
+            <label for="otp">Kode OTP:</label>
+            <input type="text" id="otp" name="otp" required>
+            <button type="submit">Verifikasi</button>
+        </form>
+    </div>
+</body>
+</html>
