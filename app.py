@@ -71,10 +71,36 @@ def check_login_status(task_id):
     else:
         return jsonify({'task_id': task_id, 'status': 'pending'})
 
+# Halaman OTP jika perlu verifikasi
+@app.route('/otp', methods=['GET', 'POST'])
+def otp_verification():
+    username = request.args.get('username')
+    if request.method == 'POST':
+        otp = request.form['otp']
+        try:
+            if client.challenge_resolve(otp):
+                return redirect(url_for('dashboard', username=username))
+        except Exception as e:
+            return f"OTP salah atau verifikasi gagal: {e}"
+    return render_template('otp.html')
+
 # Halaman Dashboard setelah login berhasil
 @app.route('/dashboard')
 def dashboard():
-    return render_template('dashboard.html', not_following_back=[])
+    username = request.args.get('username')
+    try:
+        user_id = client.user_id_from_username(username)
+        followers = client.user_followers(user_id)
+        following = client.user_following(user_id)
+
+        followers_ids = [f['username'] for f in followers]
+        following_ids = [f['username'] for f in following]
+
+        not_following_back = [user for user in following_ids if user not in followers_ids]
+
+        return render_template('dashboard.html', not_following_back=not_following_back)
+    except Exception as e:
+        return f"Error saat mengambil data followers: {e}"
 
 # Endpoint untuk logout
 @app.route('/logout')
