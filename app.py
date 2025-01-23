@@ -8,7 +8,7 @@ from rq.job import Job
 app = Flask(__name__)
 
 # Menghubungkan ke Redis dan membuat Queue
-r = redis.Redis(host='host_redis_anda', port=6379, password='password_redis_anda', ssl=True)
+r = redis.Redis(host='alive-javelin-31193.upstash.io', port=6379, password='AXnZAAIjcDFiOGNmOTk0MTFhYTg0NDRjYjI1OWU5ODlmN2FiZmY5ZnAxMA', ssl=True)
 q = Queue(connection=r)  # Membuat Queue
 
 client = Client()
