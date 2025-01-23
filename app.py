@@ -1,88 +1,76 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, jsonify
 from instagrapi import Client
-from concurrent.futures import ThreadPoolExecutor
-import time
 
 app = Flask(__name__)
 client = Client()
 
-# Set delay range for Instagram API requests
-# client.delay_range = [1, 3]  # Adding delay between requests
+# Set delay range untuk request ke API Instagram
+client.delay_range = [1, 3]  # Delay antara 1-3 detik antara permintaan
 
-# Function to fetch followers and following concurrently with reduced limits
-def get_followers_and_following(user_id):
-    with ThreadPoolExecutor() as executor:
-        # Reduce the number of followers/following fetched to 50
-        followers_future = executor.submit(client.user_followers, user_id, amount=50)  # Limit to 50 followers
-        following_future = executor.submit(client.user_following, user_id, amount=50)  # Limit to 50 following
-        followers = followers_future.result()
-        following = following_future.result()
-    return followers, following
 
-# Home page route for username and password input
+# Halaman utama untuk input username dan password
 @app.route('/')
 def index():
     return render_template('index.html')
 
-# Login route to handle login and verification
+# Endpoint untuk menangani login
 @app.route('/login', methods=['POST'])
 def login():
     username = request.form['username']
     password = request.form['password']
-    
+
     try:
-        # Login to Instagram
+        # Login Instagram
         client.login(username, password)
 
-        # Check if there is a challenge (e.g., OTP)
+        # Cek apakah ada challenge (OTP)
         challenge = client.last_json.get("challenge", {})
         if challenge:
             return redirect(url_for('otp_verification', username=username))
-        
-        # If login is successful without challenge, redirect to dashboard
+
+        # Jika login sukses tanpa challenge, arahkan ke dashboard
         return redirect(url_for('dashboard', username=username))
     except Exception as e:
-        return f"Login failed: {e}"
+        return f"Gagal login: {e}"
 
-# OTP verification page
+# Halaman OTP jika perlu verifikasi
 @app.route('/otp', methods=['GET', 'POST'])
 def otp_verification():
     username = request.args.get('username')
     if request.method == 'POST':
         otp = request.form['otp']
         try:
-            # Resolve OTP
+            # Kirim OTP dan verifikasi
             if client.challenge_resolve(otp):
                 return redirect(url_for('dashboard', username=username))
         except Exception as e:
-            return f"OTP verification failed: {e}"
+            return f"OTP salah atau verifikasi gagal: {e}"
     return render_template('otp.html')
 
-# Dashboard page after login
+# Halaman Dashboard setelah login berhasil
 @app.route('/dashboard')
 def dashboard():
     username = request.args.get('username')
     try:
         user_id = client.user_id_from_username(username)
+        followers = client.user_followers(user_id)
+        following = client.user_following(user_id)
 
-        # Fetch followers and following concurrently with reduced amount
-        followers, following = get_followers_and_following(user_id)
-
-        # Compare followers and following to find users who don't follow back
+        # Ambil ID dari followers dan following untuk membandingkan siapa yang tidak follow back
         followers_ids = [f['username'] for f in followers]
         following_ids = [f['username'] for f in following]
-        
+
         not_following_back = [user for user in following_ids if user not in followers_ids]
-        
+
         return render_template('dashboard.html', not_following_back=not_following_back)
     except Exception as e:
-        return f"Error fetching followers: {e}"
+        return f"Error saat mengambil data followers: {e}"
 
-# Logout endpoint
+# Endpoint untuk logout
 @app.route('/logout')
 def logout():
     client.logout()
-    return "Successfully logged out!"
+    return "Berhasil logout!"
 
 if __name__ == '__main__':
     app.run(debug=True)
