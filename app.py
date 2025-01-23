@@ -4,6 +4,9 @@ from instagrapi import Client
 app = Flask(__name__)
 client = Client()
 
+# Set delay range untuk request ke API Instagram
+client.delay_range = [2, 5]  # Delay antara 2-5 detik antara permintaan
+
 # Halaman utama untuk input username dan password
 @app.route('/')
 def index():
