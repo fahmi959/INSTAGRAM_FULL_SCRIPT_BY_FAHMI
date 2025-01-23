@@ -68,7 +68,7 @@ def saring_yang_mau_di_unfollow(not_following_back):
         except Exception as e:
             print(f"Gagal unfollow {user}: {e}")
 
-def pilihan_disaring_atau_tidak():
+def pilihan_disaring_atau_tidak(not_following_back):
     while True:
         # Tampilkan pilihan
         print("Pilih:")
@@ -124,9 +124,9 @@ if __name__ == "__main__":
 
     pilihan_disaring_atau_tidak(not_following_back)
 
-
     # Logout dari akun Instagram
     client.logout()
     print("Proses selesai dan akun telah logout.")
+    
     
 ############ SKRIP INI DIBUAT OLEH LORD MAJESTY FAHMOY ARDIANSYAH N RONAN ############
