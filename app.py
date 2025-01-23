@@ -23,6 +23,8 @@ def login():
         challenge = client.last_json.get("challenge", {})
         if challenge:
             return redirect(url_for('otp_verification', username=username))
+        
+        # Jika login sukses tanpa challenge, arahkan ke dashboard
         return redirect(url_for('dashboard', username=username))
     except Exception as e:
         return f"Gagal login: {e}"
