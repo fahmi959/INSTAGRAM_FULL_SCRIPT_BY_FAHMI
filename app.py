@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 from instagrapi import Client
 
-app = Flask(name)
+app = Flask(__name__)
 client = Client()
 
 # Halaman utama untuk input username dan password
@@ -17,7 +17,7 @@ def login():
     
     try:
         client.login(username, password)
-        return redirect(url_for('otp_verification'))
+        return redirect(url_for('otp_verification', username=username))
     except Exception as e:
         return f"Gagal login: {e}"
 
@@ -37,11 +37,16 @@ def otp_verification():
 @app.route('/dashboard')
 def dashboard():
     try:
-        user_id = client.user_id
+        username = request.args.get('username')
+        user_id = client.user_id_from_username(username)
         followers = client.user_followers(user_id)
         following = client.user_following(user_id)
         
-        not_following_back = [user for user in following if user not in followers]
+        # Ambil ID dari followers dan following untuk membandingkan siapa yang tidak follow back
+        followers_ids = [f['username'] for f in followers]
+        following_ids = [f['username'] for f in following]
+        
+        not_following_back = [user for user in following_ids if user not in followers_ids]
         
         return render_template('dashboard.html', not_following_back=not_following_back)
     except Exception as e:
@@ -53,5 +58,5 @@ def logout():
     client.logout()
     return "Berhasil logout!"
 
-if name == 'main':
+if __name__ == '__main__':
     app.run(debug=True)
