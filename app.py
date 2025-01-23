@@ -8,11 +8,11 @@ from rq.job import Job
 app = Flask(__name__)
 
 # Menghubungkan ke Redis dan membuat Queue
-r = redis.Redis(host='alive-javelin-31193.upstash.io', port=6379, password='AXnZAAIjcDFiOGNmOTk0MTFhYTg0NDRjYjI1OWU5ODlmN2FiZmY5ZnAxMA', ssl=True)
+r = redis.Redis(host='host_redis_anda', port=6379, password='password_redis_anda', ssl=True)
 q = Queue(connection=r)  # Membuat Queue
 
 client = Client()
-
+client.delay_range = [1, 3]  # Delay antara 1-3 detik antara permintaan
 
 # Halaman utama untuk input username dan password
 @app.route('/')
@@ -30,15 +30,6 @@ def async_login(username, password):
     except Exception as e:
         return {'status': 'error', 'message': str(e)}
 
-# Fungsi untuk menangani OTP
-def async_otp_verification(otp, username):
-    try:
-        if client.challenge_resolve(otp):
-            return {'status': 'success', 'username': username}
-        return {'status': 'failed', 'message': 'OTP verification failed'}
-    except Exception as e:
-        return {'status': 'failed', 'message': str(e)}
-
 # Endpoint untuk menangani login
 @app.route('/login', methods=['POST'])
 def login():
@@ -51,20 +42,9 @@ def login():
     # Kembalikan task_id sebagai response
     return jsonify({'task_id': job.id, 'status': 'Task started'})
 
-# Endpoint untuk menangani OTP
-@app.route('/verify_otp', methods=['POST'])
-def verify_otp():
-    otp = request.form['otp']
-    username = request.form['username']
-
-    # Panggil task RQ untuk verifikasi OTP secara asynchronous
-    job = q.enqueue(async_otp_verification, otp, username)
-
-    return jsonify({'task_id': job.id, 'status': 'OTP verification started'})
-
-# Endpoint untuk memeriksa status login atau OTP
-@app.route('/check_status/<task_id>')
-def check_status(task_id):
+# Endpoint untuk memeriksa status login
+@app.route('/check_login_status/<task_id>')
+def check_login_status(task_id):
     job = Job.fetch(task_id, connection=r)
 
     if job.is_finished:
