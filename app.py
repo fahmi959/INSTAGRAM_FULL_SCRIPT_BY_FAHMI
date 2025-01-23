@@ -1,11 +1,21 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify
+from flask import Flask, render_template, request, redirect, url_for
 from instagrapi import Client
+from concurrent.futures import ThreadPoolExecutor
 
 app = Flask(__name__)
 client = Client()
 
 # Set delay range untuk request ke API Instagram
-client.delay_range = [2, 5]  # Delay antara 2-5 detik antara permintaan
+client.delay_range = [1, 3]  # Delay antara 1-3 detik antara permintaan
+
+# Function to fetch followers and following concurrently
+def get_followers_and_following(user_id):
+    with ThreadPoolExecutor() as executor:
+        followers_future = executor.submit(client.user_followers, user_id, amount=100)  # Limit to 100 followers
+        following_future = executor.submit(client.user_following, user_id, amount=100)  # Limit to 100 following
+        followers = followers_future.result()
+        following = following_future.result()
+    return followers, following
 
 # Halaman utama untuk input username dan password
 @app.route('/')
@@ -52,9 +62,10 @@ def dashboard():
     username = request.args.get('username')
     try:
         user_id = client.user_id_from_username(username)
-        followers = client.user_followers(user_id)
-        following = client.user_following(user_id)
-        
+
+        # Fetch followers and following concurrently
+        followers, following = get_followers_and_following(user_id)
+
         # Ambil ID dari followers dan following untuk membandingkan siapa yang tidak follow back
         followers_ids = [f['username'] for f in followers]
         following_ids = [f['username'] for f in following]
