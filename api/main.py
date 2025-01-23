@@ -10,17 +10,11 @@ import uuid
 app = FastAPI()
 
 # Redis Client (For session storage)
-r = redis.Redis(
-    host='alive-javelin-31193.upstash.io',
-    port=6379,
-    db=0,
-    password='AXnZAAIjcDFiOGNmOTk0MTFhYTg0NDRjYjI1OWU5ODlmN2FiZmY5ZnAxMA',
-    ssl=True  # Ensure to use SSL connection since it's enabled
-)
+r = redis.Redis(host='alive-javelin-31193.upstash.io', port=6379, db=0, password='AXnZAAIjcDFiOGNmOTk0MTFhYTg0NDRjYjI1OWU5ODlmN2FiZmY5ZnAxMA', ssl=True)
 
 client = Client()
 
-# In-memory cache for "not-following-back" data (Optional, might be redundant with Redis)
+# In-memory cache for "not-following-back" data
 cache = {}
 
 # Models for login and OTP data
@@ -38,17 +32,25 @@ async def get_frontend():
 
 def login_in_background(session_id: str, username: str, password: str):
     try:
+        # Login to Instagram
         client.login(username, password)
-        # Save the login success state in Redis with session_id
-        r.set(session_id, json.dumps({"status": "logged_in", "message": "Login successful."}))
+        
+        # If 2FA is required, handle OTP here and store in Redis
+        if client.is_logged_in:
+            # Save the login success state in Redis with session_id
+            r.set(session_id, json.dumps({"status": "logged_in", "message": "Login successful."}))
+        else:
+            # If OTP is required, set status as OTP required
+            r.set(session_id, json.dumps({"status": "otp_required", "message": "OTP required."}))
     except Exception as e:
+        # If any error occurs, store the error message in Redis
         r.set(session_id, json.dumps({"status": "error", "message": str(e)}))
 
 @app.post("/login")
 async def login(data: LoginData, background_tasks: BackgroundTasks):
     session_id = str(uuid.uuid4())  # Generate a unique session ID
     
-    # Start background login task to avoid timeout
+    # Start background task for login to avoid timeout
     background_tasks.add_task(login_in_background, session_id, data.username, data.password)
     
     # Save the session state as 'processing'
@@ -60,6 +62,7 @@ async def login(data: LoginData, background_tasks: BackgroundTasks):
 async def verify_otp(data: OTPData):
     session_id = data.otp  # You may want to change this logic to store and retrieve the session_id differently
     try:
+        # Verify OTP challenge for 2FA (two-factor authentication)
         if client.challenge_resolve(data.otp):
             r.set(session_id, json.dumps({"status": "logged_in", "message": "OTP successfully verified."}))
             return {"message": "OTP successfully verified."}
@@ -73,6 +76,8 @@ def fetch_not_following_back(session_id: str):
     try:
         # Get the user ID for the logged-in user
         user_id = client.user_id
+        if not user_id:
+            raise Exception("User is not logged in properly")
 
         # Get the lists of followers and following
         follower_usernames = client.user_followers(user_id).keys()
@@ -96,10 +101,10 @@ async def get_not_following_back(session_id: str, background_tasks: BackgroundTa
         if session_info["status"] == "completed":
             return {"not_following_back": session_info["data"]}
         elif session_info["status"] == "error":
-            # Fixed the parentheses mismatch here
             raise HTTPException(status_code=400, detail=session_info["message"])
+        elif session_info["status"] == "otp_required":
+            return {"message": "OTP required, please verify."}
     
     # If task is still processing, start the background task to fetch data
     background_tasks.add_task(fetch_not_following_back, session_id)
     return {"message": "Fetching data in the background, please try again shortly."}
-
