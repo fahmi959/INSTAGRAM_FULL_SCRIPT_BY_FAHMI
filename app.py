@@ -16,19 +16,27 @@ def login():
     password = request.form['password']
     
     try:
+        # Login Instagram
         client.login(username, password)
-        return redirect(url_for('otp_verification', username=username))
+
+        # Cek apakah ada challenge (OTP)
+        challenge = client.last_json.get("challenge", {})
+        if challenge:
+            return redirect(url_for('otp_verification', username=username))
+        return redirect(url_for('dashboard', username=username))
     except Exception as e:
         return f"Gagal login: {e}"
 
 # Halaman OTP jika perlu verifikasi
 @app.route('/otp', methods=['GET', 'POST'])
 def otp_verification():
+    username = request.args.get('username')
     if request.method == 'POST':
         otp = request.form['otp']
         try:
+            # Kirim OTP dan verifikasi
             if client.challenge_resolve(otp):
-                return redirect(url_for('dashboard'))
+                return redirect(url_for('dashboard', username=username))
         except Exception as e:
             return f"OTP salah atau verifikasi gagal: {e}"
     return render_template('otp.html')
@@ -36,8 +44,8 @@ def otp_verification():
 # Halaman Dashboard setelah login berhasil
 @app.route('/dashboard')
 def dashboard():
+    username = request.args.get('username')
     try:
-        username = request.args.get('username')
         user_id = client.user_id_from_username(username)
         followers = client.user_followers(user_id)
         following = client.user_following(user_id)
