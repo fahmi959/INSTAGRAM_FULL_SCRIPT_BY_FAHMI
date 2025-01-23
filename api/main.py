@@ -10,11 +10,17 @@ import uuid
 app = FastAPI()
 
 # Redis Client (For session storage)
-r = redis.Redis(host='localhost', port=6379, db=0)
+r = redis.Redis(
+    host='alive-javelin-31193.upstash.io',
+    port=6379,
+    db=0,
+    password='AXnZAAIjcDFiOGNmOTk0MTFhYTg0NDRjYjI1OWU5ODlmN2FiZmY5ZnAxMA',
+    ssl=True  # Ensure to use SSL connection since it's enabled
+)
 
 client = Client()
 
-# In-memory cache for "not-following-back" data
+# In-memory cache for "not-following-back" data (Optional, might be redundant with Redis)
 cache = {}
 
 # Models for login and OTP data
