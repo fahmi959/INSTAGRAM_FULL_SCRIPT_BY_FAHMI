@@ -49,7 +49,7 @@ def saring_yang_mau_di_unfollow():
     
 
     # # Kurasi daftar berdasarkan input pengguna
-    print("Masukkan nomor pengguna yang ingin Anda pertahankan (pisahkan dengan koma), atau tekan Enter untuk lanjut:")
+    print("Semua Akan Diunfollow, Masukkan nomor urutan pengguna yang ingin Anda pertahankan (pisahkan dengan koma), atau tekan Enter untuk lanjut:")
     retained_indices = input()
     retained_users = []
 
@@ -68,7 +68,7 @@ def saring_yang_mau_di_unfollow():
         except Exception as e:
             print(f"Gagal unfollow {user}: {e}")
 
-def pilihan_disaring_atau_tidak():
+def pilihan_disaring_atau_tidak(not_following_back):
     while True:
         # Tampilkan pilihan
         print("Pilih:")
@@ -122,7 +122,7 @@ if __name__ == "__main__":
     for i, user in enumerate(not_following_back):
         print(f"{i + 1}. {user}")
 
-    pilihan_disaring_atau_tidak()
+    pilihan_disaring_atau_tidak(not_following_back)
 
 
     # Logout dari akun Instagram
