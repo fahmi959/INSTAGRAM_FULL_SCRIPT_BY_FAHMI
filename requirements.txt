@@ -4,4 +4,4 @@ gunicorn==20.1.0  # Untuk menjalankan aplikasi di Vercel
 Pillow==10.4.0  # Untuk manipulasi gambar, jika diperlukan
 celery==5.4.0  # Untuk task asynchronous
 redis==5.2.1  # Untuk koneksi ke Redis sebagai broker Celery
-rq == 2.1.0
+rq==2.1.0
