@@ -3,12 +3,18 @@ from fastapi.responses import HTMLResponse
 from instagrapi import Client
 from pydantic import BaseModel
 import time
+import redis
+import json
+import uuid
 
 app = FastAPI()
 
+# Redis Client (For session storage)
+r = redis.Redis(host='localhost', port=6379, db=0)
+
 client = Client()
 
-# In-memory cache to store the not-following-back data (to avoid hitting Instagram API too frequently)
+# In-memory cache for "not-following-back" data
 cache = {}
 
 # Models for login and OTP data
@@ -19,39 +25,45 @@ class LoginData(BaseModel):
 class OTPData(BaseModel):
     otp: str
 
-# Serve the frontend HTML
 @app.get("/", response_class=HTMLResponse)
 async def get_frontend():
     with open("static/index.html") as f:
         return f.read()
 
-# Background function for handling login to avoid timeout
-def login_in_background(username: str, password: str):
+def login_in_background(session_id: str, username: str, password: str):
     try:
-        # Login to Instagram
         client.login(username, password)
+        # Save the login success state in Redis with session_id
+        r.set(session_id, json.dumps({"status": "logged_in", "message": "Login successful."}))
     except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Login failed: {str(e)}")
+        r.set(session_id, json.dumps({"status": "error", "message": str(e)}))
 
 @app.post("/login")
 async def login(data: LoginData, background_tasks: BackgroundTasks):
-    # Start the background task for login to avoid timeout issues (Vercel has a 10-second limit)
-    background_tasks.add_task(login_in_background, data.username, data.password)
+    session_id = str(uuid.uuid4())  # Generate a unique session ID
     
-    return {"message": "Login is processing in the background. Please wait for a moment."}
+    # Start background login task to avoid timeout
+    background_tasks.add_task(login_in_background, session_id, data.username, data.password)
+    
+    # Save the session state as 'processing'
+    r.set(session_id, json.dumps({"status": "processing", "message": "Login is processing in the background. Please wait."}))
+    
+    return {"session_id": session_id}
 
 @app.post("/verify_otp")
 async def verify_otp(data: OTPData):
+    session_id = data.otp  # You may want to change this logic to store and retrieve the session_id differently
     try:
-        # Verify OTP challenge for 2FA (two-factor authentication)
         if client.challenge_resolve(data.otp):
+            r.set(session_id, json.dumps({"status": "logged_in", "message": "OTP successfully verified."}))
             return {"message": "OTP successfully verified."}
         else:
             raise HTTPException(status_code=400, detail="Invalid OTP.")
     except Exception as e:
+        r.set(session_id, json.dumps({"status": "error", "message": f"OTP verification failed: {str(e)}"}))
         raise HTTPException(status_code=400, detail=f"OTP verification failed: {str(e)}")
 
-def fetch_not_following_back():
+def fetch_not_following_back(session_id: str):
     try:
         # Get the user ID for the logged-in user
         user_id = client.user_id
@@ -63,20 +75,23 @@ def fetch_not_following_back():
         # Find users who you follow but they don't follow you back
         not_following_back = [user for user in following_usernames if user not in follower_usernames]
 
-        # Save the data to the cache with a timestamp
-        cache['not_following_back'] = {
-            'data': not_following_back,
-            'timestamp': time.time()
-        }
+        # Save the data to Redis with session_id
+        r.set(session_id, json.dumps({"status": "completed", "data": not_following_back}))
     except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Failed to fetch not-following-back users: {str(e)}")
+        r.set(session_id, json.dumps({"status": "error", "message": f"Failed to fetch not-following-back users: {str(e)}"}))
 
 @app.get("/not_following_back")
-async def get_not_following_back(background_tasks: BackgroundTasks):
-    # Check if we have cached data within the last 5 minutes (300 seconds)
-    if 'not_following_back' in cache and time.time() - cache['not_following_back']['timestamp'] < 300:
-        return {"not_following_back": cache['not_following_back']['data']}
-
-    # If the cache is expired or not present, fetch the data in the background
-    background_tasks.add_task(fetch_not_following_back)
+async def get_not_following_back(session_id: str, background_tasks: BackgroundTasks):
+    # Check Redis for the current status of the task
+    session_data = r.get(session_id)
+    
+    if session_data:
+        session_info = json.loads(session_data)
+        if session_info["status"] == "completed":
+            return {"not_following_back": session_info["data"]}
+        elif session_info["status"] == "error":
+            raise HTTPException(status_code=400, detail=session_info["message"]}
+    
+    # If task is still processing, start the background task to fetch data
+    background_tasks.add_task(fetch_not_following_back, session_id)
     return {"message": "Fetching data in the background, please try again shortly."}
