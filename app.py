@@ -9,7 +9,7 @@ import logging
 app = Flask(__name__)
 
 # Konfigurasi Redis untuk Queue
-r = redis.Redis(host='your-redis-host', port=6379, password='your-redis-password', ssl=True)
+r = redis.Redis(host='alive-javelin-31193.upstash.io', port=6379, password='AXnZAAIjcDFiOGNmOTk0MTFhYTg0NDRjYjI1OWU5ODlmN2FiZmY5ZnAxMA', ssl=True)
 q = Queue(connection=r)  # Membuat Queue
 
 # Inisialisasi Client Instagram
