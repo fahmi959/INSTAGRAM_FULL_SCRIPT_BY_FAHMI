@@ -96,8 +96,10 @@ async def get_not_following_back(session_id: str, background_tasks: BackgroundTa
         if session_info["status"] == "completed":
             return {"not_following_back": session_info["data"]}
         elif session_info["status"] == "error":
-            raise HTTPException(status_code=400, detail=session_info["message"]}
+            # Fixed the parentheses mismatch here
+            raise HTTPException(status_code=400, detail=session_info["message"])
     
     # If task is still processing, start the background task to fetch data
     background_tasks.add_task(fetch_not_following_back, session_id)
     return {"message": "Fetching data in the background, please try again shortly."}
+
