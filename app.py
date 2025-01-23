@@ -3,6 +3,16 @@ from instagrapi import Client
 from celery import Celery
 import redis
 
+# Konfigurasi Celery dengan Redis sebagai broker
+def make_celery(app):
+    celery = Celery(
+        app.import_name,
+        backend=app.config['REDIS_URL'],
+        broker=app.config['REDIS_URL']
+    )
+    celery.conf.update(app.config)
+    return celery
+
 # Inisialisasi Flask dan Redis
 app = Flask(__name__)
 app.config['REDIS_URL'] = "redis://localhost:6379/0"  # Sesuaikan dengan URL Redis Anda
@@ -93,5 +103,6 @@ def logout():
     client.logout()
     return "Berhasil logout!"
 
+# Jika Anda menjalankan aplikasi secara lokal untuk pengembangan
 if __name__ == '__main__':
     app.run(debug=True)
