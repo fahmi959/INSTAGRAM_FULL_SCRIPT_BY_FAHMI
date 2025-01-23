@@ -17,5 +17,37 @@
             <button type="submit">Login</button>
         </form>
     </div>
+
+    <!-- Tambahkan script ini di bagian bawah, sebelum penutupan </body> -->
+    <script>
+        function checkStatus(taskId) {
+            fetch(`/check_login_status/${taskId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === "pending") {
+                        setTimeout(() => checkStatus(taskId), 2000); // Cek lagi setiap 2 detik
+                    } else {
+                        alert('Task completed with status: ' + data.status);
+                    }
+                });
+        }
+
+        // Menggunakan task_id yang diterima setelah login
+        function startLogin(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            fetch('/login', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                const taskId = data.task_id;
+                checkStatus(taskId);  // Mulai polling status
+            });
+        }
+
+        document.querySelector('form').addEventListener('submit', startLogin);
+    </script>
 </body>
 </html>
