@@ -9,7 +9,12 @@ import logging
 app = Flask(__name__)
 
 # Konfigurasi Redis untuk Queue
-r = redis.Redis(host='alive-javelin-31193.upstash.io', port=6379, password='AXnZAAIjcDFiOGNmOTk0MTFhYTg0NDRjYjI1OWU5ODlmN2FiZmY5ZnAxMA', ssl=True)
+r = redis.Redis(
+    host='alive-javelin-31193.upstash.io', 
+    port=6379, 
+    password='AXnZAAIjcDFiOGNmOTk0MTFhYTg0NDRjYjI1OWU5ODlmN2FiZmY5ZnAxMA', 
+    ssl=True
+)
 q = Queue(connection=r)  # Membuat Queue
 
 # Inisialisasi Client Instagram
@@ -26,11 +31,14 @@ def index():
 # Fungsi login Instagram secara asinkron
 def async_login(username, password):
     try:
-        client.login(username, password)
+        # Login ke Instagram
+        if not client.is_logged_in:
+            client.login(username, password)
+
         challenge = client.last_json.get("challenge", {})
         if challenge:
             return {'status': 'challenge', 'username': username}
-        
+
         # Ambil data followers dan following
         user_id = client.user_id
         followers = client.user_followers(user_id)
@@ -46,6 +54,7 @@ def async_login(username, password):
         return {'status': 'success', 'username': username, 'not_following_back': not_following_back}
 
     except Exception as e:
+        logging.error(f"Error during login: {str(e)}")
         return {'status': 'error', 'message': str(e)}
 
 # Endpoint untuk login
@@ -108,6 +117,7 @@ def dashboard():
 
         return render_template('dashboard.html', not_following_back=not_following_back)
     except Exception as e:
+        logging.error(f"Error saat mengambil data followers: {str(e)}")
         return f"Error saat mengambil data followers: {e}"
 
 # Endpoint untuk logout
