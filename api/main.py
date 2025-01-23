@@ -1,11 +1,15 @@
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.responses import HTMLResponse
 from instagrapi import Client
 from pydantic import BaseModel
+import time
 
 app = FastAPI()
 
 client = Client()
+
+# In-memory cache to store the not-following-back data (to avoid hitting Instagram API too frequently)
+cache = {}
 
 # Model untuk input data login dan OTP
 class LoginData(BaseModel):
@@ -39,8 +43,7 @@ async def verify_otp(data: OTPData):
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-@app.get("/not_following_back")
-async def get_not_following_back():
+def fetch_not_following_back():
     # Ambil user_id untuk akun yang login
     user_id = client.user_id
 
@@ -51,5 +54,18 @@ async def get_not_following_back():
     # Temukan pengguna yang Anda follow tapi tidak follow back
     not_following_back = [user for user in following_usernames if user not in follower_usernames]
 
-    return {"not_following_back": not_following_back}
+    # Save to cache with timestamp
+    cache['not_following_back'] = {
+        'data': not_following_back,
+        'timestamp': time.time()
+    }
 
+@app.get("/not_following_back")
+async def get_not_following_back(background_tasks: BackgroundTasks):
+    # Check if we have cached data within the last 5 minutes
+    if 'not_following_back' in cache and time.time() - cache['not_following_back']['timestamp'] < 300:
+        return {"not_following_back": cache['not_following_back']['data']}
+
+    # If no cache or cache is outdated, start a background task to fetch data
+    background_tasks.add_task(fetch_not_following_back)
+    return {"message": "Fetching data in the background, please try again shortly."}
