@@ -1,53 +1,19 @@
-<!DOCTYPE html>
+
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Instagram Login</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+      <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <div class="container">
-        <h2>Login Instagram</h2>
-        <form action="/login" method="POST">
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" required>
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required>
-            <button type="submit">Login</button>
-        </form>
-    </div>
-
-    <!-- Tambahkan script ini di bagian bawah, sebelum penutupan </body> -->
-    <script>
-        function checkStatus(taskId) {
-            fetch(`/check_login_status/${taskId}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === "pending") {
-                        setTimeout(() => checkStatus(taskId), 2000); // Cek lagi setiap 2 detik
-                    } else {
-                        alert('Task completed with status: ' + data.status);
-                    }
-                });
-        }
-
-        // Menggunakan task_id yang diterima setelah login
-        function startLogin(event) {
-            event.preventDefault();
-            const formData = new FormData(event.target);
-            fetch('/login', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                const taskId = data.task_id;
-                checkStatus(taskId);  // Mulai polling status
-            });
-        }
-
-        document.querySelector('form').addEventListener('submit', startLogin);
-    </script>
+    <h2>Login Instagram</h2>
+    <form action="/login" method="POST">
+        <label for="username">Username:</label>
+        <input type="text" name="username" required><br><br>
+        <label for="password">Password:</label>
+        <input type="password" name="password" required><br><br>
+        <button type="submit">Login</button>
+    </form>
 </body>
 </html>
