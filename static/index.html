@@ -23,54 +23,34 @@
         <pre id="result_output"></pre>
     </div>
 
-    <script>
-        let sessionData = {};
+<script>
+    async function login() {
+        const username = document.getElementById("username").value;
+        const password = document.getElementById("password").value;
 
-        async function login() {
-            const username = document.getElementById("username").value;
-            const password = document.getElementById("password").value;
+        const response = await fetch('/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
 
-            const response = await fetch('/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
-            });
+        const data = await response.json();
+        session_id = data.session_id;
 
-            const data = await response.json();
+        // Poll for the result
+        pollForResult(session_id);
+    }
 
-            if (data.message === "Login berhasil.") {
-                sessionData.username = username;
-                sessionData.password = password;
-                document.getElementById("login_form").style.display = "none";
-                document.getElementById("otp_form").style.display = "block";
-            } else {
-                alert(data.detail);
-            }
+    async function pollForResult(session_id) {
+        const response = await fetch(`/not_following_back?session_id=${session_id}`);
+        const data = await response.json();
+
+        if (data.not_following_back) {
+            document.getElementById("result_output").textContent = JSON.stringify(data.not_following_back, null, 2);
+        } else {
+            setTimeout(() => pollForResult(session_id), 5000); // Retry every 5 seconds
         }
-
-        async function verifyOtp() {
-            const otp = document.getElementById("otp").value;
-            const response = await fetch('/verify_otp', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ otp })
-            });
-
-            const data = await response.json();
-
-            if (data.message === "OTP berhasil diverifikasi.") {
-                document.getElementById("otp_form").style.display = "none";
-                document.getElementById("result").style.display = "block";
-            } else {
-                alert(data.detail);
-            }
-        }
-
-        async function getNotFollowingBack() {
-            const response = await fetch('/not_following_back');
-            const data = await response.json();
-            document.getElementById("result_output").textContent = JSON.stringify(data, null, 2);
-        }
-    </script>
+    }
+</script>
 </body>
 </html>
