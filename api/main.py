@@ -8,9 +8,6 @@ app = FastAPI()
 
 client = Client()
 
-# In-memory cache to store the not-following-back data (to avoid hitting Instagram API too frequently)
-cache = {}
-
 # Model untuk input data login dan OTP
 class LoginData(BaseModel):
     username: str
@@ -19,19 +16,27 @@ class LoginData(BaseModel):
 class OTPData(BaseModel):
     otp: str
 
+# In-memory cache to store the not-following-back data (to avoid hitting Instagram API too frequently)
+cache = {}
+
 @app.get("/", response_class=HTMLResponse)
 async def get_frontend():
     with open("static/index.html") as f:
         return f.read()
 
-@app.post("/login")
-async def login(data: LoginData):
+# Background function for handling login (to avoid timeout)
+def login_in_background(username: str, password: str):
     try:
-        client.login(data.username, data.password)
+        client.login(username, password)
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+@app.post("/login")
+async def login(data: LoginData, background_tasks: BackgroundTasks):
+    # Start the background task for login (this avoids timeout issues)
+    background_tasks.add_task(login_in_background, data.username, data.password)
     
-    return {"message": "Login berhasil."}
+    return {"message": "Login is processing in the background. Please wait for a moment."}
 
 @app.post("/verify_otp")
 async def verify_otp(data: OTPData):
