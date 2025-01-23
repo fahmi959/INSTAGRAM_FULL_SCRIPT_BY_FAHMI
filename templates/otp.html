@@ -7,13 +7,15 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <div class="container">
-        <h2>Verifikasi OTP</h2>
-        <form action="/otp" method="POST">
-            <label for="otp">Kode OTP:</label>
-            <input type="text" id="otp" name="otp" required>
-            <button type="submit">Verifikasi</button>
-        </form>
-    </div>
+    <h2>Masukkan OTP</h2>
+    <form method="POST">
+        <label for="otp">Kode OTP:</label>
+        <input type="text" name="otp" required><br><br>
+        <button type="submit">Verifikasi</button>
+    </form>
 </body>
 </html>
+
+
+
+
