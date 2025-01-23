@@ -4,6 +4,7 @@ import redis
 from rq import Queue
 from rq.job import Job
 import logging
+import time
 
 # Inisialisasi Flask dan Redis
 app = Flask(__name__)
@@ -28,15 +29,16 @@ logging.basicConfig(level=logging.DEBUG)
 def index():
     return render_template('index.html')
 
-# Fungsi login Instagram secara asinkron
+# Fungsi login Instagram secara asinkron dengan error handling
 def async_login(username, password):
     try:
         # Login ke Instagram
-        if not client.is_logged_in:
-            client.login(username, password)
+        client.login(username, password)
 
+        # Jika ada tantangan (misal OTP atau verifikasi 2 faktor)
         challenge = client.last_json.get("challenge", {})
         if challenge:
+            logging.info(f"Challenge detected for user: {username}")
             return {'status': 'challenge', 'username': username}
 
         # Ambil data followers dan following
@@ -54,8 +56,23 @@ def async_login(username, password):
         return {'status': 'success', 'username': username, 'not_following_back': not_following_back}
 
     except Exception as e:
-        logging.error(f"Error during login: {str(e)}")
+        logging.error(f"Error during login process: {str(e)}")
         return {'status': 'error', 'message': str(e)}
+
+# Fungsi untuk menambahkan retry jika terjadi status 429
+def retry_login(username, password):
+    attempt = 0
+    while attempt < 3:  # Coba hingga 3 kali jika terjadi error 429 (Too Many Requests)
+        result = async_login(username, password)
+        if result.get('status') == 'success':
+            return result
+        elif '429' in result.get('message', ''):
+            logging.info("Rate limit exceeded. Retrying after 30 seconds...")
+            time.sleep(30)  # Tunggu selama 30 detik sebelum mencoba lagi
+            attempt += 1
+        else:
+            break
+    return result
 
 # Endpoint untuk login
 @app.route('/login', methods=['POST'])
@@ -64,7 +81,7 @@ def login():
     password = request.form['password']
 
     # Panggil tugas RQ untuk login secara asinkron
-    job = q.enqueue(async_login, username, password)
+    job = q.enqueue(retry_login, username, password)
 
     # Redirect ke halaman status untuk memeriksa task_id
     return redirect(url_for('check_login_status', task_id=job.id))
@@ -96,6 +113,7 @@ def otp_verification():
             if client.challenge_resolve(otp):
                 return redirect(url_for('dashboard', username=username))
         except Exception as e:
+            logging.error(f"OTP verification failed: {str(e)}")
             return f"OTP salah atau verifikasi gagal: {e}"
     return render_template('otp.html')
 
