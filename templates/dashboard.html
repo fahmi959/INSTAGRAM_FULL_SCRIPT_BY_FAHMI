@@ -7,11 +7,17 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <h2>Daftar Pengguna yang Tidak Follow Back</h2>
-    <ul>
+    <h1>Pengguna yang Tidak Follow Back</h1>
+
+    {% if not_following_back %}
+        <ul>
         {% for user in not_following_back %}
             <li>{{ user }}</li>
         {% endfor %}
-    </ul>
+        </ul>
+    {% else %}
+        <p>Tidak ada pengguna yang tidak follow back.</p>
+    {% endif %}
+
 </body>
 </html>
