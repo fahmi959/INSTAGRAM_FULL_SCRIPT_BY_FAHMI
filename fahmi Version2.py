@@ -45,7 +45,7 @@ def get_following():
     print(f"Ditemukan {len(following)} following.")
     return [follower.username for follower in following.values()]
 
-def saring_yang_mau_di_unfollow():
+def saring_yang_mau_di_unfollow(not_following_back):
     
 
     # # Kurasi daftar berdasarkan input pengguna
@@ -68,7 +68,7 @@ def saring_yang_mau_di_unfollow():
         except Exception as e:
             print(f"Gagal unfollow {user}: {e}")
 
-def pilihan_disaring_atau_tidak(not_following_back):
+def pilihan_disaring_atau_tidak():
     while True:
         # Tampilkan pilihan
         print("Pilih:")
@@ -78,7 +78,7 @@ def pilihan_disaring_atau_tidak(not_following_back):
         pilihan = input("Masukkan pilihan (1/2): ")
 
         if pilihan == "1":
-            saring_yang_mau_di_unfollow()  # Panggil fungsi jika pilih 1
+            saring_yang_mau_di_unfollow(not_following_back)  # Panggil fungsi jika pilih 1
             break  # Keluar dari loop setelah fungsi dijalankan
         elif pilihan == "2":
             print("Anda memilih untuk skip.")
