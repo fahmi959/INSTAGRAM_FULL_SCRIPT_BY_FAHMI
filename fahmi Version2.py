@@ -128,3 +128,5 @@ if __name__ == "__main__":
     # Logout dari akun Instagram
     client.logout()
     print("Proses selesai dan akun telah logout.")
+    
+############ SKRIP INI DIBUAT OLEH LORD MAJESTY FAHMOY ARDIANSYAH N RONAN ############
