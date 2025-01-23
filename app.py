@@ -24,11 +24,6 @@ client = Client()
 # Logger untuk debug
 logging.basicConfig(level=logging.DEBUG)
 
-# Halaman utama untuk input username dan password
-@app.route('/')
-def index():
-    return render_template('index.html')
-
 # Fungsi login Instagram secara asinkron dengan error handling
 def async_login(username, password):
     try:
