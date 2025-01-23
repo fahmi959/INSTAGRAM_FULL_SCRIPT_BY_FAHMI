@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Instagram</title>
+</head>
+<body>
+    <h1>Login Instagram</h1>
+    <div id="login_form">
+        <input type="text" id="username" placeholder="Username" required><br>
+        <input type="password" id="password" placeholder="Password" required><br>
+        <button onclick="login()">Login</button>
+    </div>
+
+    <div id="otp_form" style="display: none;">
+        <input type="text" id="otp" placeholder="Masukkan OTP" required><br>
+        <button onclick="verifyOtp()">Verifikasi OTP</button>
+    </div>
+
+    <div id="result" style="display: none;">
+        <button onclick="getNotFollowingBack()">Lihat yang Tidak Follow Back</button>
+        <pre id="result_output"></pre>
+    </div>
+
+    <script>
+        let sessionData = {};
+
+        async function login() {
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+
+            const response = await fetch('/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+
+            const data = await response.json();
+
+            if (data.message === "Login berhasil.") {
+                sessionData.username = username;
+                sessionData.password = password;
+                document.getElementById("login_form").style.display = "none";
+                document.getElementById("otp_form").style.display = "block";
+            } else {
+                alert(data.detail);
+            }
+        }
+
+        async function verifyOtp() {
+            const otp = document.getElementById("otp").value;
+            const response = await fetch('/verify_otp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ otp })
+            });
+
+            const data = await response.json();
+
+            if (data.message === "OTP berhasil diverifikasi.") {
+                document.getElementById("otp_form").style.display = "none";
+                document.getElementById("result").style.display = "block";
+            } else {
+                alert(data.detail);
+            }
+        }
+
+        async function getNotFollowingBack() {
+            const response = await fetch('/not_following_back');
+            const data = await response.json();
+            document.getElementById("result_output").textContent = JSON.stringify(data, null, 2);
+        }
+    </script>
+</body>
+</html>
