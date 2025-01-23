@@ -6,7 +6,7 @@ app = Flask(__name__)
 client = Client()
 
 # Set delay range untuk request ke API Instagram
-client.delay_range = [1, 3]  # Delay antara 1-3 detik antara permintaan
+# client.delay_range = [1, 3]  # Delay antara 1-3 detik antara permintaan
 
 # Function to fetch followers and following concurrently
 def get_followers_and_following(user_id):
