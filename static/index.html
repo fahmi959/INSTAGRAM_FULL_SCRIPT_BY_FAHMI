@@ -47,9 +47,25 @@
 
         if (data.not_following_back) {
             document.getElementById("result_output").textContent = JSON.stringify(data.not_following_back, null, 2);
+            document.getElementById("result").style.display = 'block'; // Show result
         } else {
             setTimeout(() => pollForResult(session_id), 5000); // Retry every 5 seconds
         }
+    }
+
+    async function verifyOtp() {
+        const otp = document.getElementById("otp").value;
+        const response = await fetch('/verify_otp', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ otp })
+        });
+
+        const data = await response.json();
+        alert(data.message);
+        document.getElementById("otp_form").style.display = 'none'; // Hide OTP form
+        document.getElementById("login_form").style.display = 'none'; // Hide login form
+        document.getElementById("result").style.display = 'block'; // Show result button
     }
 </script>
 </body>
