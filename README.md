@@ -103,4 +103,3 @@ Sehingga, bagian ini akan memperjelas bagaimana cara mengakses informasi profil 
 
 ## ⋆｡‧˚ʚ🧸ɞ˚‧｡⋆🩷 DIBUAT OLEH LORD FAHMI ARDIANSYAH 🩷⋆｡‧˚ʚ🧸ɞ˚‧｡⋆
 
-![License: Fahmoy](https://img.shields.io/badge/License-Fahmoy-yellow.svg)
