@@ -70,11 +70,30 @@ Jika dalam sebuah terminal anda bisa langsung ketik:
 curl -X POST http://localhost:3000/login -H "Content-Type: application/json" -d "{\"username\": \"your_instagram_username\", \"password\": \"your_instagram_password\"}"
 ```
 
-
 Penjelasan:
 - **`-X POST`**: Menentukan metode HTTP yang digunakan, dalam hal ini adalah POST.
 - **`-H "Content-Type: application/json"`**: Menambahkan header yang menunjukkan bahwa data yang dikirimkan adalah dalam format JSON.
 - **`-d`**: Digunakan untuk mengirim data (payload) ke server, dalam hal ini adalah body permintaan dengan format JSON.
 
+
 Dengan contoh di atas, Anda dapat menggunakan perintah cURL untuk mengirimkan request ke endpoint `/login` di API Anda.
 
+
+### 2. `/profile` (GET)
+Endpoint ini digunakan untuk mengambil informasi profil pengguna Instagram yang sedang login.
+
+#### **Query Params:**
+- `username`: Nama pengguna Instagram yang ingin diambil profilnya.
+
+**Contoh Request:**
+Jika Anda ingin mengambil profil pengguna tertentu, Anda bisa mengirimkan permintaan GET ke endpoint `/profile` dengan menambahkan parameter `username` di URL.
+
+```bash
+curl -X GET "http://localhost:3000/profile?username=your_instagram_username"
+
+
+### Penjelasan:
+- **`-X GET`**: Menggunakan metode HTTP GET untuk meminta data.
+- **`?username=your_instagram_username`**: Parameter `username` dalam query URL yang menunjukkan pengguna yang profilnya ingin diambil.
+
+Sehingga, bagian ini akan memperjelas bagaimana cara mengakses informasi profil pengguna Instagram menggunakan metode **GET** di API Anda.
