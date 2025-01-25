@@ -1,6 +1,6 @@
 
-![License: Fahmoy](https://img.shields.io/badge/License-Fahmoy-yellow.svg)
-# INSTAGRAM_FULL_SCRIPT_BY_FAHMI
+
+# INSTAGRAM FULL SCRIPT BY FAHMI
 
 API Fahmi ini menyediakan berbagai layanan otomatisasi untuk akun Instagram menggunakan Instagram Private API. Fungsionalitas utamanya mencakup login, pengambilan data profil, followers, following, serta menganalisis akun yang tidak mengikuti kembali (Don't Follow Back) dan mengambil followers dari akun target tertentu.
 
@@ -103,3 +103,4 @@ Sehingga, bagian ini akan memperjelas bagaimana cara mengakses informasi profil 
 
 ## ⋆｡‧˚ʚ🧸ɞ˚‧｡⋆🩷 DIBUAT OLEH LORD FAHMI ARDIANSYAH 🩷⋆｡‧˚ʚ🧸ɞ˚‧｡⋆
 
+![License: Fahmoy](https://img.shields.io/badge/License-Fahmoy-yellow.svg)
