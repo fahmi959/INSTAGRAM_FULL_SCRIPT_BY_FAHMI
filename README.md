@@ -65,6 +65,10 @@ Endpoint ini digunakan untuk melakukan login ke akun Instagram.
 }
 ```
 
+Jika dalam sebuah terminal anda bisa langsung ketik:
+curl -X POST http://localhost:3000/login -H "Content-Type: application/json" -d "{\"username\": \"your_instagram_username\", \"password\": \"your_instagram_password\"}"
+
+
 Penjelasan:
 - **`-X POST`**: Menentukan metode HTTP yang digunakan, dalam hal ini adalah POST.
 - **`-H "Content-Type: application/json"`**: Menambahkan header yang menunjukkan bahwa data yang dikirimkan adalah dalam format JSON.
