@@ -103,4 +103,5 @@ Sehingga, bagian ini akan memperjelas bagaimana cara mengakses informasi profil 
 
 ## ⋆｡‧˚ʚ🧸ɞ˚‧｡⋆🩷 DIBUAT OLEH LORD FAHMI ARDIANSYAH 🩷⋆｡‧˚ʚ🧸ɞ˚‧｡⋆
 
-![License: Fahmoy](https://img.shields.io/badge/License-Fahmoy-yellow.svg)
+[![License: Fahmoy](https://img.shields.io/badge/License-Fahmoy-yellow.svg)](https://github.com/fahmi959/INSTAGRAM_FULL_SCRIPT_BY_FAHMI?tab=License-1-ov-file)
+
