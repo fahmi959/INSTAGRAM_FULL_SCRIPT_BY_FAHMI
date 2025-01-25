@@ -90,7 +90,7 @@ Jika Anda ingin mengambil profil pengguna tertentu, Anda bisa mengirimkan permin
 
 ```bash
 curl -X GET "http://localhost:3000/profile?username=your_instagram_username"
-
+```
 
 ### Penjelasan:
 - **`-X GET`**: Menggunakan metode HTTP GET untuk meminta data.
