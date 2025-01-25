@@ -1,6 +1,6 @@
 # INSTAGRAM_FULL_SCRIPT_BY_FAHMI
 
-API ini menyediakan berbagai layanan otomatisasi untuk akun Instagram menggunakan Instagram Private API. Fungsionalitas utamanya mencakup login, pengambilan data profil, followers, following, serta menganalisis akun yang tidak mengikuti kembali (Don't Follow Back) dan mengambil followers dari akun target tertentu.
+API Fahmi ini menyediakan berbagai layanan otomatisasi untuk akun Instagram menggunakan Instagram Private API. Fungsionalitas utamanya mencakup login, pengambilan data profil, followers, following, serta menganalisis akun yang tidak mengikuti kembali (Don't Follow Back) dan mengambil followers dari akun target tertentu.
 
 ## Fitur
 
