@@ -99,4 +99,4 @@ curl -X GET "http://localhost:3000/profile?username=your_instagram_username"
 Sehingga, bagian ini akan memperjelas bagaimana cara mengakses informasi profil pengguna Instagram menggunakan metode **GET** di API Anda.
 
 
-# ⋆｡‧˚ʚ🧸ɞ˚‧｡⋆🩷 DIBUAT OLEH LORD FAHMI ARDIANSYAH 🩷⋆｡‧˚ʚ🧸ɞ˚‧｡⋆
+## ⋆｡‧˚ʚ🧸ɞ˚‧｡⋆🩷 DIBUAT OLEH LORD FAHMI ARDIANSYAH 🩷⋆｡‧˚ʚ🧸ɞ˚‧｡⋆
