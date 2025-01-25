@@ -66,7 +66,9 @@ Endpoint ini digunakan untuk melakukan login ke akun Instagram.
 ```
 
 Jika dalam sebuah terminal anda bisa langsung ketik:
+```bash
 curl -X POST http://localhost:3000/login -H "Content-Type: application/json" -d "{\"username\": \"your_instagram_username\", \"password\": \"your_instagram_password\"}"
+```
 
 
 Penjelasan:
