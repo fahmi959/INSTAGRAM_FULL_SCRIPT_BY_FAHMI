@@ -97,3 +97,6 @@ curl -X GET "http://localhost:3000/profile?username=your_instagram_username"
 - **`?username=your_instagram_username`**: Parameter `username` dalam query URL yang menunjukkan pengguna yang profilnya ingin diambil.
 
 Sehingga, bagian ini akan memperjelas bagaimana cara mengakses informasi profil pengguna Instagram menggunakan metode **GET** di API Anda.
+
+
+# ###### DIBUAT OLEH LORD FAHMI ARDIANSYAH ######
