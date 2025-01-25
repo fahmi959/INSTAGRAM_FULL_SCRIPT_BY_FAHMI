@@ -28,7 +28,8 @@ Sebelum menjalankan API ini, pastikan Anda sudah memenuhi persyaratan berikut:
 1. **Node.js** versi 14 atau lebih tinggi.
 2. **npm** atau **yarn** untuk manajer paket.
 3. Akses ke **Firebase Firestore** untuk menyimpan sesi login.
-4. Pusing ?? Gak mau ribet tinggal hubungi saya, jasa pengembangan aplikasi dan konfigurasi -> https://fahmi-website-68550.web.app/
+4. Pusing ?? Gak mau ribet tinggal hubungi saya, 
+menerima jasa pengembangan aplikasi dan konfigurasi -> https://fahmi-website-68550.web.app/
 
 ## Instalasi
 
