@@ -64,4 +64,10 @@ Endpoint ini digunakan untuk melakukan login ke akun Instagram.
   "password": "your_instagram_password"
 }
 
+Penjelasan:
+- **`-X POST`**: Menentukan metode HTTP yang digunakan, dalam hal ini adalah POST.
+- **`-H "Content-Type: application/json"`**: Menambahkan header yang menunjukkan bahwa data yang dikirimkan adalah dalam format JSON.
+- **`-d`**: Digunakan untuk mengirim data (payload) ke server, dalam hal ini adalah body permintaan dengan format JSON.
+
+Dengan contoh di atas, Anda dapat menggunakan perintah cURL untuk mengirimkan request ke endpoint `/login` di API Anda.
 
