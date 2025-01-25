@@ -62,7 +62,8 @@ Endpoint ini digunakan untuk melakukan login ke akun Instagram.
 {
   "username": "your_instagram_username",
   "password": "your_instagram_password"
-} ```
+}
+```
 
 Penjelasan:
 - **`-X POST`**: Menentukan metode HTTP yang digunakan, dalam hal ini adalah POST.
